@@ -19,7 +19,6 @@ setup(
         'sqlalchemy>=1.4.0',
         'scikit-learn>=1.0.0'
     ],
-    install_requires=[],
     long_description=long_description,
     classifiers=[
         "Programming Language :: Python",
