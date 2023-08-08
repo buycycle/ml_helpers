@@ -13,6 +13,7 @@ You would need Python 3.9 to use this package.
 ### Install from PyPI
 
 You can install Buycycle from PyPI:
+(not yet)
 
 ```
 pip install buycycle
@@ -23,7 +24,8 @@ pip install buycycle
 Alternatively, you can also install the development version directly from GitHub:
 
 ```
-pip install git+https://github.com/rauner/buycycle.git
+pip install git+ssh://git@gitlab.com/rauner/buycycle.git@0.0.1#egg=buycycle
+
 ```
 
 Please replace <your-github-username> with your actual github username.
