@@ -13,7 +13,7 @@ setup(
     license="MIT",
     author="Sebastian Rauner",
     packages=find_packages(),
-        install_requires=[
+    install_requires=[
         'pandas>=1.4.0',
         'numpy>=1.21.0',
         'sqlalchemy>=1.4.0',
