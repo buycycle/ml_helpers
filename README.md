@@ -23,7 +23,7 @@ pip install buycycle
 Alternatively, you can also install the development version directly from GitHub:
 
 ```
-pip install git+https://github.com/rauner/buycycle
+pip install git+https://github.com/rauner/buycycle.git
 ```
 
 Please replace <your-github-username> with your actual github username.
