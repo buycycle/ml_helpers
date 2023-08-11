@@ -4,18 +4,18 @@ import numpy as np
 # config file
 import configparser
 
-
 # DB connection
 from sqlalchemy import create_engine, text  # database connection
 
 # Feature engineering
 from sklearn.preprocessing import MinMaxScaler
 
-def sql_db_read(query: str, config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
+def sql_db_read(query: str, DB: str, config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
     """
     Connects to a sql database and performs a query.
     Args:
         query: SQL query
+        DB: database to connect to
         config_paths: path to config file
         dtype: Type name or dict of column -> type to coerce result DataFrame.
         index_col: Column(s) to set as index(MultiIndex).
@@ -25,11 +25,11 @@ def sql_db_read(query: str, config_paths: str = "config/config.ini", dtype=None,
     config = configparser.ConfigParser()
     config.read(config_paths)
 
-    user = config["DATABASE"]["user"]
-    host = config["DATABASE"]["host_prod"]
-    port = int(config["DATABASE"]["port"])
-    dbname = config["DATABASE"]["dbname_prod"]
-    password = config["DATABASE"]["password_prod"]
+    user = config[DB]["user"]
+    host = config[DB]["host"]
+    port = int(config[DB]["port"])
+    dbname = config[DB]["dbname"]
+    password = config[DB]["password"]
 
     # Create the connection
     engine = create_engine(
