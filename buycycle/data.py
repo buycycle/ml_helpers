@@ -42,6 +42,11 @@ def sql_db_read(query: str, DB: str, config_paths: str = "config/config.ini", dt
     return pd.read_sql_query(sql=text(query), con=engine.connect(), index_col=index_col, dtype=dtype)
 
 
+def clean_data(df) -> pd.DataFrame:
+    """ clean the data"""
+
+    df = df.drop_duplicates()
+    df = df.fillna(df.median())
 
 def categorical_encoding(df: pd.DataFrame, categorical_features: list = None, categorical_features_to_overweight: list = None, categorical_features_overweight_factor: float = 1) -> pd.DataFrame:
     """categorical encoding
