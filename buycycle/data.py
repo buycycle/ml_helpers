@@ -48,7 +48,6 @@ def clean_data(df) -> pd.DataFrame:
     df = df.drop_duplicates()
     # mode imputation
     df.fillna(df.mode().iloc[0], inplace=True)
-    df = df.fillna(df.mode())
 
 def categorical_encoding(df: pd.DataFrame, categorical_features: list = None, categorical_features_to_overweight: list = None, categorical_features_overweight_factor: float = 1) -> pd.DataFrame:
     """categorical encoding
