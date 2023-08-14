@@ -43,17 +43,20 @@ def sql_db_read(query: str, DB: str, config_paths: str = "config/config.ini", dt
 
 
 
-def categorical_encoding(df: pd.DataFrame, categorical_features: list, categorical_features_to_overweight: list, categorical_features_overweight_factor: float) -> pd.DataFrame:
+def categorical_encoding(df: pd.DataFrame, categorical_features: list, categorical_features_to_overweight: list = None, categorical_features_overweight_factor: float = 1) -> pd.DataFrame:
     """categorical encoding for the bike dataframe
     dummy variable encode and reweight according to number of unique values
     Args:
         df (pandas.DataFrame): dataframe of bikes to feature engineer
         categorical_features (list): list of categorical features
-        categorical_features_to_overweight (list): list of categorical features to overweight
-        categorical_features_overweight_factor (float): factor to overweight the categorical features by
+        categorical_features_to_overweight (list) (optional):  list of categorical features to overweight
+        categorical_features_overweight_factor (optional) (float): factor to overweight the categorical features by
     Returns:
         df (pandas.DataFrame): dataframe of bikes feature engineered
     """
+
+    if categorical_features_to_overweight is None:
+        categorical_features_to_overweight = []
 
     # Get the number of unique values for each categorical column
     unique_values_dict = {
@@ -84,18 +87,23 @@ def categorical_encoding(df: pd.DataFrame, categorical_features: list, categoric
     return df_encoded
 
 
-def numerical_scaling(df: pd.DataFrame, categorical_features: list, numerical_features: list, numerical_features_to_overweight: list, numerical_features_overweight_factor: int) -> pd.DataFrame:
+def numerical_scaling(df: pd.DataFrame, categorical_features: list, numerical_features: list, numerical_features_to_overweight: list = None, numerical_features_overweight_factor: float = 1) -> pd.DataFrame:
     """numerical scaling for the bike dataframe
     minmax scaler and apply overweight
     Args:
         df (pandas.DataFrame): dataframe of bikes to feature engineer
         categorical_features (list): list of categorical features
         numerical_features (list): list of numerical features
-        numerical_features_to_overweight (list): list of numerical features to overweight
-        numerical_features_overweight_factor (int): factor to overweight the numerical features by
+        numerical_features_to_overweight (optional) (list): list of numerical features to overweight
+        numerical_features_overweight_factor (optional) (float): factor to overweight the numerical features by
     Returns:
         df (pandas.DataFrame): dataframe of bikes feature engineered
     """
+
+    if numerical_features_to_overweight is None:
+        numerical_features_to_overweight = []
+
+
     # scale the features
     df[numerical_features] = MinMaxScaler().fit_transform(df[numerical_features])
     # reweight the numerical features according to ratio to categorical features
