@@ -10,6 +10,10 @@ from sqlalchemy import create_engine, text  # database connection
 # Feature engineering
 from sklearn.preprocessing import MinMaxScaler
 
+from time import sleep
+
+from abc import ABC, abstractmethod
+
 def sql_db_read(query: str, DB: str, config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
     """
     Connects to a sql database and performs a query.
@@ -215,4 +219,34 @@ def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_
 
     return df
 
+class DataStoreBase(ABC):
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def read_data(self):
+        pass
+
+    @abstractmethod
+    def get_logging_info(self):
+        pass
+
+    def read_data_periodically(self, period, logger):
+        """Read data periodically
+        Args:
+            period: period in minutes
+            logger: logger
+        """
+        error = None
+        period = period * 60
+        while True:
+            try:
+                self.read_data()
+                log_info = self.get_logging_info()
+                if log_info:
+                    logger.info("Data read", extra=log_info)
+                sleep(period)
+            except Exception as error:
+                logger.error("Data could not be read: " + str(error))
+                sleep(period)
 
