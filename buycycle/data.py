@@ -45,9 +45,10 @@ def sql_db_read(query: str, DB: str, config_paths: str = "config/config.ini", dt
 def clean_data(df) -> pd.DataFrame:
     """ clean the data"""
 
-    df = df.drop_duplicates()
     # mode imputation
     df.fillna(df.mode().iloc[0], inplace=True)
+
+    return df
 
 def categorical_encoding(df: pd.DataFrame, categorical_features: list = None, categorical_features_to_overweight: list = None, categorical_features_overweight_factor: float = 1) -> pd.DataFrame:
     """categorical encoding
