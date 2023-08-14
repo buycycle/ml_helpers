@@ -227,6 +227,8 @@ def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_
         },
     }
 
+    df = df.copy()
+
     # Filter dataframe to only include rows where frame_size_code is in the dictionary for the given bike_type_id and is non-numeric
     mask = (
         df[frame_size_code_column].isin(
