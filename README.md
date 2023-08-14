@@ -24,7 +24,7 @@ pip install buycycle
 Alternatively, you can also install the development version directly from GitHub:
 
 ```
-pip install git+ssh://git@gitlab.com/rauner/buycycle.git@0.0.1#egg=buycycle
+pip install git+https://gitlab.com/rauner/buycycle.git@main#egg=buycycle
 
 ```
 
