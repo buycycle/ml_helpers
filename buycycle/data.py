@@ -43,17 +43,20 @@ def sql_db_read(query: str, DB: str, config_paths: str = "config/config.ini", dt
 
 
 
-def categorical_encoding(df: pd.DataFrame, categorical_features: list, categorical_features_to_overweight: list = None, categorical_features_overweight_factor: float = 1) -> pd.DataFrame:
-    """categorical encoding for the bike dataframe
+def categorical_encoding(df: pd.DataFrame, categorical_features: list = None, categorical_features_to_overweight: list = None, categorical_features_overweight_factor: float = 1) -> pd.DataFrame:
+    """categorical encoding
     dummy variable encode and reweight according to number of unique values
+    optional overweighting of certain categorical features
     Args:
         df (pandas.DataFrame): dataframe of bikes to feature engineer
-        categorical_features (list): list of categorical features
+        categorical_features (optional) (list): list of categorical features
         categorical_features_to_overweight (list) (optional):  list of categorical features to overweight
         categorical_features_overweight_factor (optional) (float): factor to overweight the categorical features by
     Returns:
         df (pandas.DataFrame): dataframe of bikes feature engineered
     """
+    if categorical_features is None:
+        categorical_features = df.select_dtypes(include=['object']).columns.tolist()
 
     if categorical_features_to_overweight is None:
         categorical_features_to_overweight = []
@@ -87,18 +90,23 @@ def categorical_encoding(df: pd.DataFrame, categorical_features: list, categoric
     return df_encoded
 
 
-def numerical_scaling(df: pd.DataFrame, categorical_features: list, numerical_features: list, numerical_features_to_overweight: list = None, numerical_features_overweight_factor: float = 1) -> pd.DataFrame:
+def numerical_scaling(df: pd.DataFrame, categorical_features: list = None, numerical_features: list = None, numerical_features_to_overweight: list = None, numerical_features_overweight_factor: float = 1) -> pd.DataFrame:
     """numerical scaling for the bike dataframe
     minmax scaler and apply overweight
     Args:
         df (pandas.DataFrame): dataframe of bikes to feature engineer
-        categorical_features (list): list of categorical features
-        numerical_features (list): list of numerical features
+        categorical_features (optional) (list): list of categorical features
+        numerical_features (optional) (list): list of numerical features
         numerical_features_to_overweight (optional) (list): list of numerical features to overweight
         numerical_features_overweight_factor (optional) (float): factor to overweight the numerical features by
     Returns:
         df (pandas.DataFrame): dataframe of bikes feature engineered
     """
+    if categorical_features is None:
+        categorical_features = df.select_dtypes(include=['object']).columns.tolist()
+
+    if numerical_features is None:
+        numerical_features = df.select_dtypes(include=['number']).columns.tolist()
 
     if numerical_features_to_overweight is None:
         numerical_features_to_overweight = []
@@ -106,12 +114,15 @@ def numerical_scaling(df: pd.DataFrame, categorical_features: list, numerical_fe
 
     # scale the features
     df[numerical_features] = MinMaxScaler().fit_transform(df[numerical_features])
+
     # reweight the numerical features according to ratio to categorical features
-    df[numerical_features] = df[numerical_features] * \
-        len(categorical_features)/len(numerical_features)
-    # overweight certain numerical features
-    df[numerical_features_to_overweight] = df[numerical_features_to_overweight] * \
-        numerical_features_overweight_factor
+    if len(numerical_features) > 0:
+        df[numerical_features] = df[numerical_features] * \
+            len(categorical_features)/len(numerical_features)
+        # overweight certain numerical features
+        df[numerical_features_to_overweight] = df[numerical_features_to_overweight] * \
+            numerical_features_overweight_factor
+
     return df
 
 
