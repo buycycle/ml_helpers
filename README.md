@@ -4,7 +4,7 @@ Buycycle is a python package that provides common functions for machine learning
 
 ## Key Features
 
-* Insert the key features of your package here
+Functions include data read-in, feature engineering as well as a DataStorageBase ABC.
 
 ## Installation
 
