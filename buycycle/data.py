@@ -194,14 +194,12 @@ def get_data_status_mask(df: pd.DataFrame, status: list) -> pd.DataFrame:
 
 
 def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_id", frame_size_code_column="frame_size_code") -> pd.DataFrame:
-    """map string frame_size_code with numeric frame_size_code
+    """map string frame_size_code with numeric frame_size_code, changes in place
     Args:
         df (pandas.DataFrame): dataframe of bikes
         bike_type_id_column (str): column name of bike_type_id
         frame_size_code_column (str): column name of frame_size_code
 
-    Returns:
-        df (pandas.DataFrame): dataframe of bikes with numeric frame_size_code
     """
     # for each bike_type_id replace the frame_size_code with a numiric value from a dictionery
     frame_size_code_to_cm = {
@@ -245,7 +243,6 @@ def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_
     # Transform the frame_size_code to numeric, for the already numeric but in string format
     df[frame_size_code_column] = pd.to_numeric(df[frame_size_code_column])
 
-    return df
 
 class DataStoreBase(ABC):
     def __init__(self):
