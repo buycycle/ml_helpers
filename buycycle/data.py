@@ -14,7 +14,7 @@ from time import sleep
 
 from abc import ABC, abstractmethod
 
-def sql_db_read(query: str, DB: str, config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
+def sql_db_read(query: str, DB: str, driver:str = "mysql+pymysql", config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
     """
     Connects to a sql database and performs a query.
     Args:
@@ -37,7 +37,7 @@ def sql_db_read(query: str, DB: str, config_paths: str = "config/config.ini", dt
 
     # Create the connection
     engine = create_engine(
-        url="mysql+pymysql://{0}:{1}@{2}:{3}/{4}".format(user, password, host, port, dbname))
+        url="{0}://{1}:{2}@{3}:{4}/{5}".format(driver ,user, password, host, port, dbname))
 
     return pd.read_sql_query(sql=text(query), con=engine.connect(), index_col=index_col, dtype=dtype)
 
