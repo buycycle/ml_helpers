@@ -16,10 +16,11 @@ from abc import ABC, abstractmethod
 
 def sql_db_read(query: str, DB: str, driver:str = "mysql+pymysql", config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
     """
-    Connects to a sql database and performs a query.
+    Connects to a sql database and performs a query. Optionally, use non mysql driver.
     Args:
         query: SQL query
         DB: database to connect to
+        driver: driver to use
         config_paths: path to config file
         dtype: Type name or dict of column -> type to coerce result DataFrame.
         index_col: Column(s) to set as index(MultiIndex).
