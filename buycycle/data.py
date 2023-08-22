@@ -4,6 +4,8 @@ import numpy as np
 # config file
 import configparser
 
+import boto3
+
 # DB connection
 from sqlalchemy import create_engine, text  # database connection
 
@@ -43,13 +45,26 @@ def sql_db_read(query: str, DB: str, driver:str = "mysql+pymysql", config_paths:
     return pd.read_sql_query(sql=text(query), con=engine.connect(), index_col=index_col, dtype=dtype)
 
 
-def clean_data(df) -> pd.DataFrame:
-    """ clean the data"""
+def aws_client(config_paths: str = "config/config.ini", service_name: str = "s3") -> boto3.client:
+    """read the config file and return the aws client
+    Args:
+        config_paths (str): path to the config file
+    Returns:
+        client
+    """
+    config = configparser.ConfigParser()
+    config.read(config_paths)
 
-    # mode imputation
-    df.fillna(df.mode().iloc[0], inplace=True)
+    aws_access_key_id = config["AWS"]["aws_access_key_id"]
+    aws_secret_access_key = config["AWS"]["aws_secret_access_key"]
 
-    return df
+    return boto3.client(
+        service_name,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,)
+
+
+
 
 def categorical_encoding(df: pd.DataFrame, categorical_features: list = None, categorical_features_to_overweight: list = None, categorical_features_overweight_factor: float = 1) -> pd.DataFrame:
     """categorical encoding
