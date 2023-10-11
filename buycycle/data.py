@@ -45,6 +45,34 @@ def sql_db_read(query: str, DB: str, driver:str = "mysql+pymysql", config_paths:
     return pd.read_sql_query(sql=text(query), con=engine.connect(), index_col=index_col, dtype=dtype)
 
 
+def snowflake_sql_db_read(query: str, DB: str, driver:str = "snowflake", config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
+    """
+    Connects to a Snowflake database and performs a query.
+    Args:
+        query: SQL query
+        DB: database to connect to
+        driver: driver to use
+        config_paths: path to config file
+        dtype: Type name or dict of column -> type to coerce result DataFrame.
+        index_col: Column(s) to set as index(MultiIndex).
+    Returns:
+        DataFrame object
+    """
+    config = configparser.ConfigParser()
+    config.read(config_paths)
+    user = config[DB]["user"]
+    password = config[DB]["password"]
+    account = config[DB]["account"]
+    warehouse = config[DB]["warehouse"]
+    role = config[DB]["role"]
+    dbname = config[DB]["dbname"]
+    schema = config[DB]["schema"]
+    # Create the connection
+    engine = create_engine(
+        url="{0}://{1}:{2}@{3}/{4}/{5}?warehouse={6}&role={7}".format(driver ,user, password, account, dbname, schema, warehouse, role))
+    return pd.read_sql_query(sql=text(query), con=engine.connect(), index_col=index_col, dtype=dtype)
+
+
 def aws_client(config_paths: str = "config/config.ini", service_name: str = "s3") -> boto3.client:
     """read the config file and return the aws client
     Args:
