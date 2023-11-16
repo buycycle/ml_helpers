@@ -235,21 +235,20 @@ def get_data_status_mask(df: pd.DataFrame, status: list) -> pd.DataFrame:
 
     return mask
 
-
-
-def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_id", frame_size_code_column="frame_size_code") -> pd.DataFrame:
-    """map string frame_size_code with numeric frame_size_code
+def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_id", frame_size_code_column="frame_size_code", default_value=56) -> pd.DataFrame:
+    """Map string frame_size_code with numeric frame_size_code and assign a default value if missing or not in mapping.
     Args:
         df (pandas.DataFrame): dataframe of bikes
         bike_type_id_column (str): column name of bike_type_id
         frame_size_code_column (str): column name of frame_size_code
-
+        default_value (int or str): default value to assign if frame_size_code is missing or not in mapping
     Returns:
         df (pandas.DataFrame): dataframe of bikes with numeric frame_size_code
     """
-    # for each bike_type_id replace the frame_size_code with a numiric value from a dictionery
+    # Mapping dictionary
     frame_size_code_to_cm = {
-        1:  {
+        1: {
+            "xxxs": "43",  # Example value for "xxxs"
             "xxs": "46",
             "xs": "49",
             "s": "52",
@@ -259,7 +258,8 @@ def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_
             "xxl": "62",
             "xxxl": "64",
         },
-        2:  {
+        2: {
+            "xxxs": "30",  # Example value for "xxxs"
             "xxs": "33",
             "xs": "36",
             "s": "41",
@@ -270,24 +270,12 @@ def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_
             "xxxl": "61",
         },
     }
-
-
-    # Filter dataframe to only include rows where frame_size_code is in the dictionary for the given bike_type_id and is non-numeric
-    mask = (
-        df[frame_size_code_column].isin(
-            ["xxs", "xs", "s", "m", "l", "xl", "xxl", "xxxl"]
-        )
-        & df[frame_size_code_column].str.isnumeric().eq(False)
+    # Apply the mapping to each row
+    df[frame_size_code_column] = df.apply(
+        lambda row: frame_size_code_to_cm.get(row[bike_type_id_column], {}).get(row[frame_size_code_column], default_value), axis=1
     )
-
-    # Replace the frame_size_code with the numeric value from the dictionary
-    df.loc[mask, frame_size_code_column] = df.loc[mask].apply(
-        lambda row: frame_size_code_to_cm[row[bike_type_id_column]][row[frame_size_code_column]], axis=1
-    )
-
-    # Transform the frame_size_code to numeric, for the already numeric but in string format
-    df[frame_size_code_column] = pd.to_numeric(df[frame_size_code_column])
-
+    # Transform the frame_size_code to numeric
+    df[frame_size_code_column] = pd.to_numeric(df[frame_size_code_column], errors='coerce').fillna(default_value).astype(int)
     return df
 
 class DataStoreBase(ABC):
