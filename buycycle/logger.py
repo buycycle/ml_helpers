@@ -40,13 +40,16 @@ class KafkaLogger(Logger):
     def __init__(self, environment: str, ab: str, app_name: str, app_version: str, topic: str, bootstrap_servers: str, log_level=logging.INFO):
         self.producer = KafkaProducer(bootstrap_servers=bootstrap_servers)
         self.topic = topic
-        self.logger = self.configure_logger(environment, app_name, app_version, log_level)
+        self.logger = self.configure_logger(environment, ab, app_name, app_version, log_level)
 
     def send_log(self, level, message, extra):
-        log_record = self.logger.makeRecord(self.logger.name, level, None, None, message, None, None, extra={'extra': extra})
-        log_json = self.logger.handlers[0].formatter.format(log_record)
-        self.producer.send(self.topic, log_json.encode())
-
+        try:
+            log_record = self.logger.makeRecord(self.logger.name, level, None, None, message, None, None, extra={'extra': extra})
+            log_json = self.logger.handlers[0].formatter.format(log_record)
+            self.producer.send(self.topic, log_json.encode())
+        except Exception as e:
+            # Handle the exception (e.g., print to stderr, fallback to another logger, etc.)
+            print(f"Failed to send log to Kafka: {e}")
     def debug(self, message, extra=None):
         self.send_log(logging.DEBUG, message, extra)
 
