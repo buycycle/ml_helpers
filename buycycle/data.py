@@ -303,7 +303,7 @@ class DataStoreBase(ABC):
                 self.read_data()
                 log_info = self.get_logging_info()
                 if log_info:
-                    logger.info("Data read", extra=log_info)
+                    logger.info("Data read")
                 sleep(period)
             except Exception as error:
                 logger.error("Data could not be read: " + str(error))
