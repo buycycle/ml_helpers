@@ -10,29 +10,24 @@ class AppJsonFormatter(jsonlogger.JsonFormatter):
         self.ab = ab
         self.app_name = app_name
         self.app_version = app_version
-
-
     def process_log_record(self, log_record):
         log_record['environment'] = self.environment
         log_record['ab'] = self.ab
         log_record['app_name'] = self.app_name
         log_record['app_version'] = self.app_version
         return super().process_log_record(log_record)
-
 class Logger:
-    # allos using this method without instantiating the class
     @staticmethod
     def configure_logger(environment, ab, app_name, app_version, log_level=logging.INFO):
         logger = logging.getLogger(__name__)
         logger.setLevel(log_level)
-
-        log_handler = logging.StreamHandler()
-
-        format_str = '%(levelname)s %(asctime)s %(environment)s %(ab)s %(app_name)s %(app_version)s %(message)s'
-        formatter = AppJsonFormatter(environment, ab, app_name, app_version, fmt=format_str)
-        log_handler.setFormatter(formatter)
-        logger.addHandler(log_handler)
-
+        logger.propagate = False  # Prevent log messages from being duplicated
+        # Check if handlers are already configured (to avoid adding multiple handlers)
+        if not logger.handlers:
+            log_handler = logging.StreamHandler()
+            formatter = AppJsonFormatter(environment, ab, app_name, app_version)
+            log_handler.setFormatter(formatter)
+            logger.addHandler(log_handler)
         return logger
 
 
