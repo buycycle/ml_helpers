@@ -236,7 +236,7 @@ def get_data_status_mask(df: pd.DataFrame, status: list) -> pd.DataFrame:
     return mask
 
 def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_id", frame_size_code_column="frame_size_code", default_value=56) -> pd.DataFrame:
-    """Map string frame_size_code with numeric frame_size_code and assign a default value if missing or not in mapping.
+    """Map string frame_size_code with numeric frame_size_code if its non numeric and assign a default value if missing or not in mapping.
     Args:
         df (pandas.DataFrame): dataframe of bikes
         bike_type_id_column (str): column name of bike_type_id
@@ -270,12 +270,14 @@ def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_
             "xxxl": "61",
         },
     }
+    # check if this works with create_data
+
     # Apply the mapping to each row
     df[frame_size_code_column] = df.apply(
-        lambda row: frame_size_code_to_cm.get(row[bike_type_id_column], {}).get(row[frame_size_code_column], default_value), axis=1
+        lambda row: int(frame_size_code_to_cm.get(row[bike_type_id_column], {}).get(row[frame_size_code_column], default_value))
+        if not pd.to_numeric(row[frame_size_code_column], errors='coerce').notna() else int(row[frame_size_code_column]),
+        axis=1
     )
-    # Transform the frame_size_code to numeric
-    df[frame_size_code_column] = pd.to_numeric(df[frame_size_code_column], errors='coerce').fillna(default_value).astype(int)
     return df
 
 class DataStoreBase(ABC):
