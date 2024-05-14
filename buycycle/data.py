@@ -235,8 +235,51 @@ def get_data_status_mask(df: pd.DataFrame, status: list) -> pd.DataFrame:
 
     return mask
 
+def get_numeric_frame_size(frame_size_code, bike_type_id, default_value=56):
+    """Convert frame_size_code and bike_type_id to a numeric value.
+    Args:
+        frame_size_code (str or int): frame size code to convert
+        bike_type_id (int): bike type identifier
+        default_value (int): default value if conversion is not possible
+    Returns:
+        int: numeric value of frame size code
+    """
+    # Mapping dictionary
+    frame_size_code_to_cm = {
+        1: {
+            "xxxs": 43,
+            "xxs": 46,
+            "xs": 49,
+            "s": 52,
+            "m": 54,
+            "l": 57,
+            "xl": 60,
+            "xxl": 62,
+            "xxxl": 64,
+        },
+        2: {
+            "xxxs": 30,
+            "xxs": 33,
+            "xs": 36,
+            "s": 41,
+            "m": 46,
+            "l": 52,
+            "xl": 56,
+            "xxl": 58,
+            "xxxl": 61,
+        },
+    }
+
+    # If frame_size_code is already numeric, return it as is
+    if isinstance(frame_size_code, (np.float64, np.int64)):
+        return int(frame_size_code)
+
+    # Convert frame_size_code to string in case it's not and try to get the numeric value
+    frame_size_code = str(frame_size_code).lower()
+    return frame_size_code_to_cm.get(bike_type_id, {}).get(frame_size_code, default_value)
+
 def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_id", frame_size_code_column="frame_size_code", default_value=56) -> pd.DataFrame:
-    """Map string frame_size_code with numeric frame_size_code if its non numeric and assign a default value if missing or not in mapping.
+    """Map string frame_size_code with numeric frame_size_code and assign a default value if missing or not in mapping.
     Args:
         df (pandas.DataFrame): dataframe of bikes
         bike_type_id_column (str): column name of bike_type_id
@@ -245,39 +288,12 @@ def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_
     Returns:
         df (pandas.DataFrame): dataframe of bikes with numeric frame_size_code
     """
-    # Mapping dictionary
-    frame_size_code_to_cm = {
-        1: {
-            "xxxs": "43",  # Example value for "xxxs"
-            "xxs": "46",
-            "xs": "49",
-            "s": "52",
-            "m": "54",
-            "l": "57",
-            "xl": "60",
-            "xxl": "62",
-            "xxxl": "64",
-        },
-        2: {
-            "xxxs": "30",  # Example value for "xxxs"
-            "xxs": "33",
-            "xs": "36",
-            "s": "41",
-            "m": "46",
-            "l": "52",
-            "xl": "56",
-            "xxl": "58",
-            "xxxl": "61",
-        },
-    }
-    # check if this works with create_data
-
-    # Apply the mapping to each row
+    # Apply the get_numeric_frame_size function to each row
     df[frame_size_code_column] = df.apply(
-        lambda row: int(frame_size_code_to_cm.get(row[bike_type_id_column], {}).get(row[frame_size_code_column], default_value))
-        if not pd.to_numeric(row[frame_size_code_column], errors='coerce').notna() else int(row[frame_size_code_column]),
-        axis=1
+        lambda row: get_numeric_frame_size(row[frame_size_code_column], row[bike_type_id_column], default_value), axis=1
     )
+    # Ensure the frame_size_code column is of type int
+    df[frame_size_code_column] = df[frame_size_code_column].astype(int)
     return df
 
 class DataStoreBase(ABC):
