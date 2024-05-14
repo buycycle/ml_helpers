@@ -274,9 +274,13 @@ def get_numeric_frame_size(frame_size_code, bike_type_id, default_value=56):
     if isinstance(frame_size_code, (np.float64, np.int64)):
         return int(frame_size_code)
 
-    # Convert frame_size_code to string in case it's not and try to get the numeric value
-    frame_size_code = str(frame_size_code).lower()
-    return frame_size_code_to_cm.get(bike_type_id, {}).get(frame_size_code, default_value)
+    # Attempt to convert frame_size_code to an integer if it's a string that represents a number
+    try:
+        return int(frame_size_code)
+    except ValueError:
+        # If conversion fails, it's not a simple number string; proceed with the mapping
+        frame_size_code = str(frame_size_code).lower()
+        return frame_size_code_to_cm.get(bike_type_id, {}).get(frame_size_code, default_value)
 
 def frame_size_code_to_numeric(df: pd.DataFrame, bike_type_id_column="bike_type_id", frame_size_code_column="frame_size_code", default_value=56) -> pd.DataFrame:
     """Map string frame_size_code with numeric frame_size_code and assign a default value if missing or not in mapping.
