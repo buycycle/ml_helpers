@@ -228,10 +228,30 @@ def get_data_status_mask(df: pd.DataFrame, status: list) -> pd.DataFrame:
         status (list): list of status to filter by
 
     Returns:
-        df (pandas.DataFrame): dataframe of bikes with the given status
+        mask (list): bikes indicies with the given status
     """
 
     mask = df.index[df["status"].isin(status)].tolist()
+
+    return mask
+
+def get_preference_mask(df: pd.DataFrame, preference: dict) -> pd.DataFrame:
+    """get the ids that match a certain preference dict
+    Args:
+        df (pandas.DataFrame): dataframe of bikes
+        preference (dict): preferences dict with feauture as key and value to filter as value
+
+    Returns:
+        mask (list): bikes indicies with the given status
+    """
+
+    # Start with all indices
+    mask = df.index.tolist()
+
+    # Narrow down the indices based on each preference
+    for feature, value in preference.items():
+        if feature in df.columns:
+            mask = df.index[df[feature] == value].intersection(mask).tolist()
 
     return mask
 
