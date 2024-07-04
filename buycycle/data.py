@@ -236,23 +236,24 @@ def get_data_status_mask(df: pd.DataFrame, status: list) -> pd.DataFrame:
     return mask
 
 def get_preference_mask(df: pd.DataFrame, preference: dict) -> pd.DataFrame:
-    """get the ids that match a certain preference dict
+    """Get the indices that match a certain preference dict.
     Args:
-        df (pandas.DataFrame): dataframe of bikes
-        preference (dict): preferences dict with feauture as key and value to filter as value
-
+        df (pandas.DataFrame): dataframe of items
+        preference (dict): preferences dict with feature as key and value(s) to filter as value, also lists are allowed
     Returns:
-        mask (list): bikes indicies with the given status
+        mask (list): indices of items with the given preferences
     """
-
     # Start with all indices
     mask = df.index.tolist()
-
     # Narrow down the indices based on each preference
     for feature, value in preference.items():
         if feature in df.columns:
-            mask = df.index[df[feature] == value].intersection(mask).tolist()
-
+            if isinstance(value, list):  # Check if the value is a list (multiple values)
+                # Use isin to filter by multiple values and update the mask
+                mask = df.index[df[feature].isin(value)].intersection(mask).tolist()
+            else:
+                # Single value, proceed as before
+                mask = df.index[df[feature] == value].intersection(mask).tolist()
     return mask
 
 def get_numeric_frame_size(frame_size_code, bike_type_id, default_value=56):
