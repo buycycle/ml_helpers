@@ -42,7 +42,8 @@ def sql_db_read(query: str, DB: str, driver:str = "mysql+pymysql", config_paths:
     engine = create_engine(
         url="{0}://{1}:{2}@{3}:{4}/{5}".format(driver ,user, password, host, port, dbname))
 
-    return pd.read_sql_query(sql=text(query), con=engine.connect(), index_col=index_col, dtype=dtype)
+    with engine.connect() as connection:
+        return pd.read_sql_query(sql=text(query), con=connection, index_col=index_col, dtype=dtype)
 
 
 def snowflake_sql_db_read(query: str, DB: str, driver:str = "snowflake", config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
