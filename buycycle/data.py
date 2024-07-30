@@ -257,7 +257,7 @@ def get_preference_mask(df: pd.DataFrame, preference: dict) -> pd.DataFrame:
                 mask = df.index[df[feature] == value].intersection(mask).tolist()
     return mask
 
-def get_numeric_frame_size(frame_size_code, bike_type_id, default_value=56):
+def get_numeric_frame_size(frame_size_code, bike_type_id=1, default_value=56):
     """Convert frame_size_code and bike_type_id to a numeric value.
     Args:
         frame_size_code (str or int): frame size code to convert
