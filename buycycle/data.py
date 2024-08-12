@@ -277,6 +277,32 @@ def get_preference_mask_condition(df: pd.DataFrame, preferences: tuple) -> list:
             mask &= condition_mask
     # Convert the boolean mask to a list of indices
     return mask[mask].index.tolist()
+
+def get_preference_mask_condition_list(df: pd.DataFrame, preferences: tuple) -> pd.Series:
+    """Get the mask that matches a certain preference tuple.
+    Args:
+        df (pandas.DataFrame): dataframe of items
+        preferences (tuple): preferences tuple with feature as key and a list of lambda functions to filter as value
+    Returns:
+        mask (pd.Series): boolean mask of items with the given preferences
+    """
+    # Start with a mask that includes no items
+    mask = pd.Series([False] * len(df), index=df.index)
+    # Narrow down the mask based on each preference
+    for feature, conditions in preferences:
+        if feature in df.columns:
+            # Initialize a feature-specific mask with no items
+            feature_mask = pd.Series([False] * len(df), index=df.index)
+            # Iterate over conditions for the feature
+            for condition in conditions:
+                # Apply the lambda function to get the condition mask
+                condition_mask = condition(df)
+                # Combine with the feature-specific mask using logical OR
+                feature_mask |= condition_mask
+            # Combine with the existing mask using logical AND
+            mask |= feature_mask
+    return mask
+
 def get_numeric_frame_size(frame_size_code, bike_type_id=1, default_value=56):
     """Convert frame_size_code and bike_type_id to a numeric value.
     Args:
