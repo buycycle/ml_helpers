@@ -279,12 +279,22 @@ def get_preference_mask_condition(df: pd.DataFrame, preferences: tuple) -> list:
     return mask[mask].index.tolist()
 
 def get_preference_mask_condition_list(df: pd.DataFrame, preferences: tuple) -> pd.Series:
-    """Get the mask that matches a certain preference tuple.
+    """
+    Returns a boolean Series indicating items in df that match any condition in the list of lambda functions for each feature in preferences.
     Args:
-        df (pandas.DataFrame): dataframe of items
-        preferences (tuple): preferences tuple with feature as key and a list of lambda functions to filter as value
+        df (pd.DataFrame): The DataFrame containing items to be filtered.
+        preferences (tuple): A tuple where each item is a pair consisting of a
+            feature (column name) and a list of lambda functions. Each lambda
+            function represents a filtering condition for that feature. An item
+            must satisfy any condition in the list to be considered a match for
+            the feature.
     Returns:
-        mask (pd.Series): boolean mask of items with the given preferences
+        pd.Series: A boolean Series where True indicates that the item at the
+            corresponding index in the DataFrame fulfills the filtering conditions.
+            The mask is constructed by applying a logical OR across all conditions
+            for each feature and then combining the results for all features using
+            another logical OR, effectively applying an "any" logic within and
+            across features.
     """
     # Start with a mask that includes no items
     mask = pd.Series([False] * len(df), index=df.index)
