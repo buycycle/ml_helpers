@@ -278,9 +278,9 @@ def get_preference_mask_condition(df: pd.DataFrame, preferences: tuple) -> list:
     # Convert the boolean mask to a list of indices
     return mask[mask].index.tolist()
 
-def get_preference_mask_condition_list(df: pd.DataFrame, preferences: tuple) -> pd.Series:
+def get_preference_mask_condition_list(df: pd.DataFrame, preferences: tuple) -> list:
     """
-    Returns a boolean Series indicating items in df that match any condition in the list of lambda functions for each feature in preferences.
+    Returns a list of indices indicating items in df that match any condition in the list of lambda functions for each feature in preferences.
     Args:
         df (pd.DataFrame): The DataFrame containing items to be filtered.
         preferences (tuple): A tuple where each item is a pair consisting of a
@@ -289,7 +289,7 @@ def get_preference_mask_condition_list(df: pd.DataFrame, preferences: tuple) -> 
             must satisfy any condition in the list to be considered a match for
             the feature.
     Returns:
-        pd.Series: A boolean Series where True indicates that the item at the
+        list: A list of indices where True indicates that the item at the
             corresponding index in the DataFrame fulfills the filtering conditions.
             The mask is constructed by applying a logical OR across all conditions
             for each feature and then combining the results for all features using
@@ -309,9 +309,10 @@ def get_preference_mask_condition_list(df: pd.DataFrame, preferences: tuple) -> 
                 condition_mask = condition(df)
                 # Combine with the feature-specific mask using logical OR
                 feature_mask |= condition_mask
-            # Combine with the existing mask using logical AND
+            # Combine with the existing mask using logical OR
             mask |= feature_mask
-    return mask
+    # Convert the boolean mask to a list of indices
+    return mask.index[mask].tolist()
 
 def get_numeric_frame_size(frame_size_code, bike_type_id=1, default_value=56):
     """Convert frame_size_code and bike_type_id to a numeric value.
