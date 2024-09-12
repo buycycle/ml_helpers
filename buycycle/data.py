@@ -280,38 +280,25 @@ def get_preference_mask_condition(df: pd.DataFrame, preferences: tuple) -> list:
 
 def get_preference_mask_condition_list(df: pd.DataFrame, preferences: tuple) -> list:
     """
-    Returns a list of indices indicating items in df that match any condition in the list of lambda functions for each feature in preferences.
+    Returns a list of indices indicating items in df that match any of the combined conditions
+    specified by the preferences tuple. Each combined condition corresponds to a full set of
+    preferences for a single user.
     Args:
         df (pd.DataFrame): The DataFrame containing items to be filtered.
         preferences (tuple): A tuple where each item is a pair consisting of a
             feature (column name) and a list of lambda functions. Each lambda
-            function represents a filtering condition for that feature. An item
-            must satisfy any condition in the list to be considered a match for
-            the feature.
+            function represents a combined filtering condition for that feature.
     Returns:
         list: A list of indices where True indicates that the item at the
-            corresponding index in the DataFrame fulfills the filtering conditions.
-            The mask is constructed by applying a logical OR across all conditions
-            for each feature and then combining the results for all features using
-            another logical OR, effectively applying an "any" logic within and
-            across features.
+            corresponding index in the DataFrame fulfills the combined filtering conditions.
     """
-    # Start with a mask that includes no items
     mask = pd.Series([False] * len(df), index=df.index)
-    # Narrow down the mask based on each preference
     for feature, conditions in preferences:
-        if feature in df.columns:
-            # Initialize a feature-specific mask with no items
-            feature_mask = pd.Series([False] * len(df), index=df.index)
-            # Iterate over conditions for the feature
-            for condition in conditions:
-                # Apply the lambda function to get the condition mask
-                condition_mask = condition(df)
-                # Combine with the feature-specific mask using logical OR
-                feature_mask |= condition_mask
-            # Combine with the existing mask using logical OR
-            mask |= feature_mask
-    # Convert the boolean mask to a list of indices
+        feature_mask = pd.Series([False] * len(df), index=df.index)
+        for condition in conditions:
+            condition_mask = condition(df)
+            feature_mask |= condition_mask
+        mask |= feature_mask
     return mask.index[mask].tolist()
 
 def get_numeric_frame_size(frame_size_code, bike_type_id=1, default_value=56):
