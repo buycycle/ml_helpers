@@ -313,6 +313,7 @@ def get_numeric_frame_size(frame_size_code, bike_type_id=1, default_value=56):
     # Mapping dictionary
     frame_size_code_to_cm = {
         1: {
+            "none": 1,
             "xxxs": 43,
             "xxs": 46,
             "xs": 49,
