@@ -15,6 +15,8 @@ from sklearn.preprocessing import MinMaxScaler
 from time import sleep
 
 from abc import ABC, abstractmethod
+import json
+
 
 def sql_db_read(query: str, DB: str, driver:str = "mysql+pymysql", config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
     """
@@ -397,4 +399,20 @@ class DataStoreBase(ABC):
             except Exception as error:
                 logger.error("Data could not be read: " + str(error))
                 sleep(period)
+
+class NumpyEncoder(json.JSONEncoder):
+    """
+    Custom JSON encoder for NumPy data types.
+    Converts NumPy integers to Python ints, NumPy floats to Python floats,
+    and NumPy arrays to lists. Other types are handled by the superclass.
+    """
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NumpyEncoder, self).default(obj)
 
