@@ -4,7 +4,6 @@ import numpy as np
 # config file
 import configparser
 
-import boto3
 
 # DB connection
 from sqlalchemy import create_engine, text  # database connection
@@ -75,24 +74,6 @@ def snowflake_sql_db_read(query: str, DB: str, driver:str = "snowflake", config_
         url="{0}://{1}:{2}@{3}/{4}/{5}?warehouse={6}&role={7}".format(driver ,user, password, account, dbname, schema, warehouse, role))
     return pd.read_sql_query(sql=text(query), con=engine.connect(), index_col=index_col, dtype=dtype)
 
-
-def aws_client(config_paths: str = "config/config.ini", service_name: str = "s3") -> boto3.client:
-    """read the config file and return the aws client
-    Args:
-        config_paths (str): path to the config file
-    Returns:
-        client
-    """
-    config = configparser.ConfigParser()
-    config.read(config_paths)
-
-    aws_access_key_id = config["AWS"]["aws_access_key_id"]
-    aws_secret_access_key = config["AWS"]["aws_secret_access_key"]
-
-    return boto3.client(
-        service_name,
-        aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key,)
 
 
 
