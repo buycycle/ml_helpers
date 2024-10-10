@@ -17,6 +17,29 @@ from abc import ABC, abstractmethod
 import json
 
 
+def validate_integer_field(value, default_value):
+    """
+    Validates and converts a given value to an integer.
+    This function attempts to convert the provided value to an integer. If the value is None or cannot be
+    converted to an integer (e.g., if it's a non-numeric string), the function returns a specified default value.
+    Parameters:
+    - value: The value to be validated and converted. It can be of any type.
+    - default_value: The default integer value to return if the conversion fails or if the value is None.
+    Returns:
+    - An integer value, either the converted value or the default value if conversion is not possible.
+    """
+    if value is None:
+        return default_value
+    if isinstance(value, str):
+        try:
+            # Attempt to convert the string to an integer
+            return int(value)
+        except ValueError:
+            # If conversion fails, return the default value
+            return default_value
+    return value
+
+
 def sql_db_read(query: str, DB: str, driver:str = "mysql+pymysql", config_paths: str = "config/config.ini", dtype=None, index_col=None) -> pd.DataFrame:
     """
     Connects to a sql database and performs a query. Optionally, use non mysql driver.
